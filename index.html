@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지진해일 대피소 현황 - 1209 손현호</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 28px;
+        }
+        .student-info {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 6px;
+            display: inline-block;
+            float: right;
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        table {
+            width: 100% !important;
+            margin-top: 20px;
+        }
+        th {
+            background-color: #007bff !important;
+            color: white !important;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            color: #868e96;
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>전국 실시간 지진해일 대피소 현황</h1>
+        </header>
+        
+        <div class="clearfix">
+            <div class="student-info">
+                제출자: 1학년 1209 손현호
+            </div>
+        </div>
+
+        <table id="shelterTable" class="display">
+            <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>지역(시도)</th>
+                    <th>지역(시군구)</th>
+                    <th>대피소 명칭</th>
+                    <th>주소</th>
+                    <th>수용가능인원(명)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- API 데이터가 여기에 렌더링됩니다 -->
+            </tbody>
+        </table>
+
+        <div class="footer">
+            본 웹페이지는 공공데이터 포털의 '행정안전부_지진해일대피소' Open API를 활용하여 제작되었습니다.<br>
+            데이터 제공 기관: 행정안전부 | 개발자: 1209 손현호
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        async function fetchShelterData() {
+            const serviceKey = '540adb15a2cf53956a1d0f29bb02fd4030983468fc91539134316c0f8e3f660d';
+            // 전국 데이터 조회를 위해 numOfRows를 1000으로 설정
+            const url = `https://apis.data.go.kr/1741000/TsunamiShelter3/getTsunamiShelter1List?serviceKey=${serviceKey}&pageNo=1&numOfRows=1000&type=json`;
+            
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                // API 구조에 맞춰 데이터 경로 설정
+                const shelterList = result.TsunamiShelter[1].row;
+                const tableBody = document.getElementById('tableBody');
+                
+                shelterList.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item.sido_name}</td>
+                        <td>${item.sigungu_name}</td>
+                        <td><strong>${item.shel_nm}</strong></td>
+                        <td>${item.address}</td>
+                        <td>${item.shel_av}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // 데이터 로드 후 DataTable 적용
+                $('#shelterTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ko.json"
+                    },
+                    "pageLength": 15,
+                    "order": [[0, "asc"]]
+                });
+
+            } catch (error) {
+                console.error('API 로드 실패:', error);
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">API 데이터를 불러오는 데 실패했습니다. (CORS 정책 또는 키 오류)</td></tr>';
+            }
+        }
+
+        // 페이지 로드 시 API 호출
+        document.addEventListener('DOMContentLoaded', fetchShelterData);
+    </script>
+</body>
+</html>
