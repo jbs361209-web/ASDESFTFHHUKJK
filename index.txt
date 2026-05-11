@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>지진해일 대피소 1209 손현호</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background: #3498db; color: white; }
+    </style>
+</head>
+<body>
+    <h2>🌊 지진해일 대피소 현황</h2>
+    <table>
+        <tr><th>명칭</th><th>주소</th><th>유형</th><th>수용인원</th><th>관리기관</th></tr>
+        {% for i in items %}
+        <tr>
+            <td>**{{ i.nm }}**</td>
+            <td>{{ i.addr }}</td>
+            <td>{{ i.tp }}</td>
+            <td>{{ i.capa }}명</td>
+            <td>{{ i.org }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
