@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전국 지진해일 대피소 현황 - 1209 손현호</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+        .info {
+            text-align: right;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100% !important;
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #007bff !important;
+            color: white !important;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>전국 지진해일 대피소 현황 안내</h1>
+        </header>
+        
+        <div class="info">
+            제출자: 1학년 1209 손현호
+        </div>
+
+        <table id="shelterTable" class="display">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>지역</th>
+                    <th>대피지구명</th>
+                    <th>주소</th>
+                    <th>수용가능인원(명)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- API 데이터가 들어갈 자리 (시연용 샘플 데이터) -->
+                <tr>
+                    <td>1</td>
+                    <td>강원특별자치도</td>
+                    <td>삼척해수욕장</td>
+                    <td>강원특별자치도 삼척시 교동</td>
+                    <td>1,500</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>강원특별자치도</td>
+                    <td>경포대초등학교</td>
+                    <td>강원특별자치도 강릉시 안현동</td>
+                    <td>850</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>경상북도</td>
+                    <td>대진항일원</td>
+                    <td>경상북도 영덕군 영해면</td>
+                    <td>420</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            본 서비스는 공공데이터 포털의 '행정안전부_지진해일대피소' API 데이터를 활용하여 제작되었습니다.
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#shelterTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ko.json"
+                },
+                "pageLength": 10
+            });
+        });
+    </script>
+</body>
+</html>
