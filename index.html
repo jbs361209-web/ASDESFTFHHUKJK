@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경상남도 재난대피시설 검색</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans KR', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #dc2626 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e40af 0%, #dc2626 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .student-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .search-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #1e40af 0%, #dc2626 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-search:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-search:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #e9ecef;
+            color: #333;
+            min-width: 100px;
+        }
+
+        .btn-reset:hover {
+            background: #dee2e6;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #1e40af;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e40af;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .result-count {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-left: 4px solid #1e40af;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .result-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .result-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            color: #555;
+            word-break: break-word;
+        }
+
+        .error {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            color: #856404;
+            margin-bottom: 20px;
+        }
+
+        .error.danger {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 6px;
+            color: #155724;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #1565c0;
+            font-size: 0.9em;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            min-width: 40px;
+            background: #e9ecef;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .pagination button:hover {
+            background: #dee2e6;
+        }
+
+        .pagination button.active {
+            background: #1e40af;
+            color: white;
+            border-color: #1e40af;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚨 경상남도 재난대피시설 검색</h1>
+            <p>경상남도 재난대피시설 현황 조회 서비스</p>
+            <div class="student-info">제작: 1209손현호</div>
+        </header>
+
+        <div class="content">
+            <div class="info-box">
+                <strong>📌 서비스 정보</strong>
+                <div>이 서비스는 경상남도에서 제공하는 재난대피시설 정보를 검색할 수 있습니다. 페이지 번호를 선택하여 모든 대피시설을 조회해보세요.</div>
+            </div>
+
+            <div class="search-section">
+                <h2>🔍 시설 조회</h2>
+                <div class="search-grid">
+                    <div class="form-group">
+                        <label for="pageSize">페이지당 결과 수</label>
+                        <select id="pageSize">
+                            <option value="10">10개</option>
+                            <option value="20">20개</option>
+                            <option value="50">50개</option>
+                            <option value="100">100개</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-search" onclick="performSearch(1)">첫 페이지 조회</button>
+                    <button class="btn-reset" onclick="resetForm()">초기화</button>
+                </div>
+            </div>
+
+            <div id="messageArea"></div>
+
+            <div id="loadingArea" class="loading">
+                <div class="spinner"></div>
+                <p>조회 중입니다. 잠시만 기다려주세요...</p>
+            </div>
+
+            <div id="resultsArea" class="results-section" style="display: none;">
+                <h2>📋 조회 결과</h2>
+                <div class="result-count" id="resultCount"></div>
+                <div id="resultsList"></div>
+                <div id="paginationArea" class="pagination"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 경상남도 재난대피시설 검색 서비스 | API 활용 기간: 2026-05-08 ~ 2028-05-08</p>
+            <p>제작자: 1209손현호</p>
+        </footer>
+    </div>
+
+    <script>
+        // API 설정
+        const API_KEY = '540adb15a2cf53956a1d0f29bb02fd4030983468fc91539134316c0f8e3f660d';
+        const API_ENDPOINT = 'https://apis.data.go.kr/6480000/gyeongnamdisasterfacility/gyeongnamdisasterfacilitylist';
+
+        let currentPage = 1;
+        let totalCount = 0;
+        let currentPageSize = 10;
+
+        // 폼 초기화
+        function resetForm() {
+            document.getElementById('pageSize').value = '10';
+            document.getElementById('messageArea').innerHTML = '';
+            document.getElementById('resultsArea').style.display = 'none';
+            currentPage = 1;
+            currentPageSize = 10;
+        }
+
+        // 검색 수행
+        async function performSearch(pageNo = 1) {
+            const pageSize = document.getElementById('pageSize').value;
+            currentPageSize = parseInt(pageSize);
+            currentPage = pageNo;
+
+            // 로딩 표시
+            showLoading(true);
+            document.getElementById('messageArea').innerHTML = '';
+            document.getElementById('resultsArea').style.display = 'none';
+
+            try {
+                // API 요청 파라미터 구성
+                const params = new URLSearchParams();
+                params.append('serviceKey', API_KEY);
+                params.append('pageNo', pageNo);
+                params.append('numOfRows', pageSize);
+                params.append('resultType', 'json');
+
+                const url = API_ENDPOINT + '?' + params.toString();
+
+                console.log('API 호출:', url.replace(API_KEY, '***'));
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                console.log('API 응답:', data);
+
+                showLoading(false);
+
+                // 응답 처리
+                if (data.gyeongnamdisasterfacilitylist?.body?.items?.item) {
+                    let items = data.gyeongnamdisasterfacilitylist.body.items.item;
+                    
+                    // 단일 항목인 경우 배열로 변환
+                    if (!Array.isArray(items)) {
+                        items = [items];
+                    }
+
+                    totalCount = data.gyeongnamdisasterfacilitylist.body.totalCount || 0;
+                    
+                    displayResults(items);
+                    document.getElementById('resultCount').textContent = `총 ${totalCount}개 시설 중 ${items.length}개 표시`;
+                    showMessage(`${items.length}개의 재난대피시설을 조회했습니다.`, 'success');
+                    displayPagination(pageNo, currentPageSize);
+                } else {
+                    showLoading(false);
+                    showMessage('조회 결과가 없습니다.', 'error');
+                }
+            } catch (error) {
+                showLoading(false);
+                console.error('조회 오류:', error);
+                showMessage('조회 중 오류가 발생했습니다: ' + error.message, 'error');
+            }
+        }
+
+        // 검색 결과 표시
+        function displayResults(items) {
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                
+                const title = item.DATA_TITLE || '재난대피시설 ' + (index + 1);
+                const address = item.USER_ADDRESS || '주소 정보 없음';
+                const idx = item.DATA_IDX || '';
+
+                resultItem.innerHTML = `
+                    <div class="result-title">${escapeHtml(title)}</div>
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <div class="detail-label">주소</div>
+                            <div class="detail-value">${escapeHtml(address)}</div>
+                        </div>
+                        ${idx ? `<div class="detail-item"><div class="detail-label">시설 ID</div><div class="detail-value">${escapeHtml(String(idx))}</div></div>` : ''}
+                    </div>
+                `;
+                
+                resultsList.appendChild(resultItem);
+            });
+
+            document.getElementById('resultsArea').style.display = 'block';
+        }
+
+        // 페이지네이션 표시
+        function displayPagination(currentPageNo, pageSize) {
+            const paginationArea = document.getElementById('paginationArea');
+            paginationArea.innerHTML = '';
+
+            const totalPages = Math.ceil(totalCount / pageSize);
+            
+            if (totalPages <= 1) return;
+
+            // 이전 버튼
+            if (currentPageNo > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = '◀ 이전';
+                prevBtn.onclick = () => performSearch(currentPageNo - 1);
+                paginationArea.appendChild(prevBtn);
+            }
+
+            // 페이지 번호 버튼 (최대 5개)
+            const startPage = Math.max(1, currentPageNo - 2);
+            const endPage = Math.min(totalPages, currentPageNo + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = i === currentPageNo ? 'active' : '';
+                pageBtn.onclick = () => performSearch(i);
+                paginationArea.appendChild(pageBtn);
+            }
+
+            // 다음 버튼
+            if (currentPageNo < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = '다음 ▶';
+                nextBtn.onclick = () => performSearch(currentPageNo + 1);
+                paginationArea.appendChild(nextBtn);
+            }
+        }
+
+        // 메시지 표시
+        function showMessage(message, type = 'info') {
+            const messageArea = document.getElementById('messageArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success' : (type === 'error' ? 'error danger' : 'error');
+            messageDiv.textContent = message;
+            messageArea.innerHTML = '';
+            messageArea.appendChild(messageDiv);
+        }
+
+        // 로딩 표시
+        function showLoading(show) {
+            document.getElementById('loadingArea').style.display = show ? 'block' : 'none';
+        }
+
+        // HTML 이스케이프
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // 페이지 로드 시 첫 번째 페이지 자동 조회
+        window.addEventListener('load', () => {
+            performSearch(1);
+        });
+    </script>
+</body>
+</html>
